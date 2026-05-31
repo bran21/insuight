@@ -11,6 +11,14 @@ Currently, two official plugins are available:
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
+## Documentation
+
+Detailed architecture and integration plans can be found in the `/docs` directory:
+- [Testnet Deployments & Addresses](./docs/deployments.md) *(Required for Hackathon)*
+- [Backend Architecture](./docs/prediction_market_backend.md)
+- [Agent Vault Implementation](./docs/onchain_implementation.md)
+- [Resolution Sources](./docs/resolution_sources.md):
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
