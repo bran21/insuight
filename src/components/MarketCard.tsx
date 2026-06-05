@@ -3,9 +3,10 @@ import type { OracleState } from '../services/predictApi';
 interface MarketCardProps {
   oracle: OracleState;
   index: number;
+  onClick?: () => void;
 }
 
-export default function MarketCard({ oracle, index }: MarketCardProps) {
+export default function MarketCard({ oracle, index, onClick }: MarketCardProps) {
   const isActive = oracle.status === 'active';
 
   const impliedProb = oracle.spot && oracle.forward
@@ -30,6 +31,7 @@ export default function MarketCard({ oracle, index }: MarketCardProps) {
     <div
       className="market-card"
       style={{ animationDelay: `${index * 0.05}s` }}
+      onClick={onClick}
     >
       {/* Header */}
       <div className="market-card__header">

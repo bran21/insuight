@@ -143,15 +143,15 @@ export default function AgentConsole() {
           {/* Terminal Body */}
           <div
             ref={scrollRef}
-            className="relative p-5 h-[480px] overflow-y-auto bg-[#040508] scroll-smooth border-t border-[#1a1c2e]"
+            className="relative p-5 h-[480px] overflow-y-auto bg-[#0a0a0a] scroll-smooth border-t border-white/5"
           >
             {/* Terminal scanlines / grid */}
-            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(99,102,241,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.2)_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,black_20%,transparent_100%)]" />
+            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,black_20%,transparent_100%)]" />
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]" />
 
             <div className="relative z-10 h-full">
               {monologue.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-text-muted gap-3">
+              <div className="flex flex-col items-center justify-center h-full text-white/40 gap-3">
                 <span className="text-3xl opacity-30">⌨️</span>
                 <p className="text-xs font-mono opacity-60 text-center max-w-[200px]">
                   Press "Demo" or "Live Scan" to start the agent…
@@ -168,7 +168,7 @@ export default function AgentConsole() {
                     <span className={`tag ${tagColors[line.tag]}`}>
                       [{line.tag.toUpperCase()}]
                     </span>
-                    <span className="text-text-primary/85">
+                    <span className="text-white/85">
                       {line.message}
                     </span>
                   </div>
@@ -176,7 +176,7 @@ export default function AgentConsole() {
                 {isRunning && (
                   <div className="monologue-line" style={{ opacity: 1 }}>
                     <span className="tag tag-waiting">▌</span>
-                    <span className="text-text-muted animate-pulse text-xs">thinking…</span>
+                    <span className="text-white/30 animate-pulse text-xs">thinking…</span>
                   </div>
                 )}
               </div>

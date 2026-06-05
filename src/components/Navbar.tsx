@@ -3,9 +3,12 @@ import { ConnectButton, useCurrentAccount } from '@mysten/dapp-kit';
 import { NavLink } from 'react-router-dom';
 
 const NAV_LINKS = [
-  { to: '/app', label: 'Markets', abbr: 'MK' },
-  { to: '/app/agent', label: 'Agent', abbr: 'AG' },
-  { to: '/app/portfolio', label: 'Portfolio', abbr: 'PF' },
+  { to: '/app', label: 'Markets' },
+  { to: '/app/agent', label: 'AI Agent' },
+  { to: '/app/portfolio', label: 'Portfolio' },
+  { to: '/app/leaderboard', label: 'Leaderboard' },
+  { to: '/app/competitions', label: 'Competitions' },
+  { to: '/app/earn', label: 'Earn' }
 ];
 
 export default function Navbar() {
@@ -14,82 +17,113 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Desktop: Vertical Sidebar ── */}
-      <nav className="hidden md:flex flex-col items-center justify-between w-[56px] min-h-screen bg-bg-sidebar sticky top-0 py-6 z-50 border-r border-black/10">
+      {/* ── Desktop Top Navbar ── */}
+      <nav className="app-navbar">
+        <div className="app-navbar__left">
+          {/* Logo */}
+          <NavLink to="/app" className="navbar-logo group">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white group-hover:text-gray-300 transition-colors">
+              <defs>
+                <mask id="chart-cutout-desktop">
+                  <rect width="32" height="32" fill="white" />
+                  <path d="M3 23 L12 14 L16 18 L25 6.5" fill="none" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+                </mask>
+              </defs>
+              <path d="M8 7 h16 v3.5 h-6 v11 h6 v3.5 h-16 v-3.5 h6 v-11 h-6 z" fill="currentColor" mask="url(#chart-cutout-desktop)" />
+              <path d="M3 23 L12 14 L16 18 L25 6.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              <polygon points="19.5,7.5 26.5,4.5 23.5,11.5" fill="currentColor" />
+              <path d="M27.5 4.5 L29.5 2.5 M25 2.5 L25.5 0 M28.5 7 L31 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <span className="navbar-logo__text ml-1">Insuight</span>
+          </NavLink>
 
-        {/* Logo */}
-        <NavLink to="/app" className="group mb-8">
-          <div className="w-8 h-8 rounded-lg bg-black/5 flex items-center justify-center text-sm group-hover:bg-black/10 transition-colors">
-            <span className="text-text-primary font-serif font-bold text-base">I</span>
+          {/* Nav Links */}
+          <div className="navbar-nav">
+            {NAV_LINKS.map(({ to, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/app'}
+                className={({ isActive }) =>
+                  `navbar-nav-link${isActive ? ' active' : ''}`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
           </div>
-        </NavLink>
-
-        {/* Nav Links — vertical text */}
-        <div className="flex flex-col items-center gap-1 flex-1">
-          {NAV_LINKS.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/app'}
-              className={({ isActive }) =>
-                `sidebar-nav-link ${isActive ? 'active' : ''}`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
         </div>
 
-        {/* Bottom: Wallet indicator */}
-        <div className="flex flex-col items-center gap-3">
-          {account && (
-            <div className="w-2 h-2 rounded-full bg-green" title={account.address} />
-          )}
-          <div className="connect-btn-wrapper [&_button]:!p-1.5 [&_button]:!text-[0px] [&_button]:!rounded-lg [&_button]:!w-8 [&_button]:!h-8">
+        <div className="app-navbar__right">
+          {/* Balances */}
+          <div className="navbar-balances">
+            <div className="balance-item text-green font-mono font-bold">$21,417</div>
+            <div className="balance-item text-text-primary font-mono font-bold">5,342,782 <span className="text-text-muted">🪙</span></div>
+          </div>
+          
+          {/* Notifications */}
+          <button className="navbar-icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </button>
+          
+          {/* Deposit Button */}
+          <button className="btn-primary py-1.5 px-4 text-sm bg-white text-black hover:bg-gray-200">
+            Deposit
+          </button>
+          
+          {/* User Profile / Wallet */}
+          <div className="navbar-wallet connect-btn-wrapper">
             <ConnectButton />
           </div>
         </div>
       </nav>
 
-      {/* ── Mobile: Top bar ── */}
-      <div className="md:hidden sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-bg-primary/90 backdrop-blur-xl border-b border-border">
-        <NavLink to="/app" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-            <span className="text-bg-primary font-serif font-bold text-sm">I</span>
-          </div>
-          <span className="font-serif text-lg text-text-primary">Insuight</span>
+      {/* ── Mobile Top Bar ── */}
+      <div className="mobile-topbar">
+        <NavLink to="/app" className="mobile-topbar__logo group">
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white group-hover:text-gray-300 transition-colors">
+            <defs>
+              <mask id="chart-cutout-mobile">
+                <rect width="32" height="32" fill="white" />
+                <path d="M3 23 L12 14 L16 18 L25 6.5" fill="none" stroke="black" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+              </mask>
+            </defs>
+            <path d="M8 7 h16 v3.5 h-6 v11 h6 v3.5 h-16 v-3.5 h6 v-11 h-6 z" fill="currentColor" mask="url(#chart-cutout-mobile)" />
+            <path d="M3 23 L12 14 L16 18 L25 6.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            <polygon points="19.5,7.5 26.5,4.5 23.5,11.5" fill="currentColor" />
+            <path d="M27.5 4.5 L29.5 2.5 M25 2.5 L25.5 0 M28.5 7 L31 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <span className="mobile-topbar__logo-text ml-1">Insuight</span>
         </NavLink>
 
-        <div className="flex items-center gap-2">
-          <div className="connect-btn-wrapper">
-            <ConnectButton />
-          </div>
+        <div className="mobile-topbar__actions">
           <button
-            className="flex flex-col gap-1 p-2 rounded-lg hover:bg-accent-soft transition-colors"
+            className="mobile-topbar__hamburger"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
-            <span className="w-4 h-0.5 bg-text-primary rounded-full" />
-            <span className="w-3 h-0.5 bg-text-primary rounded-full" />
+            <span />
+            <span />
           </button>
         </div>
       </div>
 
-      {/* ── Mobile: Slide-out menu ── */}
+      {/* ── Mobile Drawer ── */}
       {mobileOpen && (
         <>
-          <div className="mobile-menu-backdrop" onClick={() => setMobileOpen(false)} />
-          <div className="mobile-menu-panel">
-            <div className="flex items-center justify-between mb-10">
-              <span className="font-serif text-xl text-text-primary">Insuight</span>
+          <div className="mobile-drawer-backdrop" onClick={() => setMobileOpen(false)} />
+          <div className="mobile-drawer">
+            <div className="mobile-drawer__header">
+              <span className="mobile-drawer__title">Menu</span>
               <button
-                className="text-text-muted hover:text-text-primary text-lg p-1"
+                className="mobile-drawer__close"
                 onClick={() => setMobileOpen(false)}
               >
                 ✕
               </button>
             </div>
-            <div className="flex flex-col gap-1">
+            
+            <div className="mobile-drawer__nav">
               {NAV_LINKS.map(({ to, label }) => (
                 <NavLink
                   key={to}
@@ -97,25 +131,19 @@ export default function Navbar() {
                   end={to === '/app'}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-black/5 text-text-primary'
-                        : 'text-text-muted hover:text-text-primary hover:bg-black/5'
-                    }`
+                    `mobile-drawer__link${isActive ? ' active' : ''}`
                   }
                 >
                   {label}
                 </NavLink>
               ))}
             </div>
-            {account && (
-              <div className="mt-10 pt-6 border-t border-black/10">
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Wallet</p>
-                <p className="text-xs text-text-secondary font-mono break-all leading-relaxed">
-                  {account.address}
-                </p>
-              </div>
-            )}
+
+            <div className="mobile-drawer__wallet mt-auto pt-5 border-t border-white/10">
+               <div className="connect-btn-wrapper w-full">
+                 <ConnectButton />
+               </div>
+            </div>
           </div>
         </>
       )}

@@ -9,6 +9,7 @@ export default defineConfig({
       '/predict-api': {
         target: 'https://predict-server.testnet.mystenlabs.com',
         changeOrigin: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/predict-api/, ''),
       },
     },
