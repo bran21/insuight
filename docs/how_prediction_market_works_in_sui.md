@@ -4,18 +4,31 @@ This document explains the architectural design of the custom Prediction Market 
 
 ## One Market Per Package Deployment
 
-Because of how the `predict` contract is currently written, **you can only create exactly ONE market per deployed package.**
+Because of how Sui Move handles object ownership and native Coins:
+1. Generating a new Coin (like `YES` and `NO`) requires a One-Time Witness (OTW).
+2. OTWs are tied strictly to the package publishing transaction. They generate exactly one `TreasuryCap<YES>` and one `TreasuryCap<NO>` per deployment.
+3. The `create_market` function in the custom contract completely *consumes* these `TreasuryCap` instances and embeds them into the newly created shared `Market` object.
 
-Here is the technical breakdown of why this happens:
+Because the TreasuryCaps are locked inside the first created market, you cannot call `create_market` a second time with the same package. If you wish to create a distinct, isolated custom market pool, you must re-deploy the `predict` smart contract package entirely.
 
-1. **One-Time Witnesses (OTW) for Coins:**
-   In Sui Move, generating a new native Coin (like `YES` and `NO`) requires a One-Time Witness (OTW). This means those coins are hardcoded to the package when you deploy it. Upon package initialization, exactly one `TreasuryCap<YES>` and one `TreasuryCap<NO>` are generated and transferred to the deployer.
+## Automated Market Maker (AMM) Integration
 
-2. **Consuming the TreasuryCap:**
-   When you call the `create_market` function, the smart contract takes those `TreasuryCap` objects **by value** and locks them permanently inside the new `Market` shared object. This is done so that the market pool has the exclusive authority to mint and burn shares based on user deposits.
+To emulate a fully functional prediction market (like Polymarket), the custom contract integrates a **Constant Product Market Maker (CPMM)**. 
+- **Pools**: Each market maintains an internal `pool_yes` and `pool_no`.
+- **Trading**: When a user buys YES, their SUI is locked into the vault, an equal number of YES and NO shares are minted, and their NO shares are instantly swapped into the AMM pool in exchange for *more* YES shares based on the `x * y = k` pricing curve.
 
-3. **Single Use Capability:**
-   Because the `TreasuryCap` is consumed by the `Market` object, your deployer wallet no longer holds it. As a result, you cannot call `create_market` a second time. The capabilities are locked to that single specific market pool.
+## The Admin System & Delegation (Co-Resolvers)
+
+When a market is created, an `AdminCap` object is minted and transferred directly to the creator's wallet. This `AdminCap` provides the sole authority to officially **Resolve** the market (declaring YES or NO as the winner).
+
+### Delegation for Crowded Markets
+To prevent the creator from becoming a bottleneck in highly active markets, the `AdminCap` structure has the `store` ability and the contract includes a `delegate_admin` function.
+
+```move
+public fun delegate_admin(cap: &AdminCap, ctx: &mut TxContext): AdminCap
+```
+
+This allows the original creator to mint *additional* `AdminCap` objects for the exact same market and transfer them to trusted co-admins. Any co-admin holding a valid `AdminCap` can then use the Admin Dashboard (`/admin`) to officially resolve the market on behalf of the protocol.
 
 ## Creating Multiple Markets
 

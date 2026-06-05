@@ -111,6 +111,25 @@ export function buildBuyNoTx(
 }
 
 /**
+ * Builds a transaction to delegate admin capabilities to a co-admin.
+ */
+export function buildDelegateAdminTx(
+  adminCapId: string,
+  delegateAddress: string
+): Transaction {
+  const tx = new Transaction();
+
+  const newAdminCap = tx.moveCall({
+    target: `${CUSTOM_MARKET_PACKAGE}::market::delegate_admin`,
+    arguments: [tx.object(adminCapId)],
+  });
+
+  tx.transferObjects([newAdminCap], tx.pure.address(delegateAddress));
+
+  return tx;
+}
+
+/**
  * Builds a transaction for the admin to resolve the market.
  * 
  * @param marketId The object ID of the shared Market object

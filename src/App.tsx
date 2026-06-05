@@ -5,6 +5,8 @@ import PredictDashboard from './components/PredictDashboard';
 import AgentConsole from './components/AgentConsole';
 import PortfolioView from './components/PortfolioView';
 import NotFound from './components/NotFound';
+import AdminLayout from './components/AdminLayout';
+import AdminDashboard from './components/AdminDashboard';
 
 export default function App() {
   return (
@@ -18,6 +20,11 @@ export default function App() {
           <Route index element={<PredictDashboard />} />
           <Route path="agent" element={<AgentConsole />} />
           <Route path="portfolio" element={<PortfolioView />} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
         </Route>
 
         {/* Catch-all */}

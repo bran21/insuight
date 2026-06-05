@@ -27,7 +27,7 @@ public struct Market has key {
     winner: u8, // 0 = unresolved, 1 = YES, 2 = NO
 }
 
-public struct AdminCap has key {
+public struct AdminCap has key, store {
     id: UID,
     market_id: ID,
 }
@@ -142,6 +142,15 @@ public fun resolve(market: &mut Market, cap: &AdminCap, winner: u8) {
     
     market.resolved = true;
     market.winner = winner;
+}
+
+/// Allows an existing Admin to mint an additional AdminCap for the exact same market.
+/// This enables delegating resolution authority to co-admins without giving up the original cap.
+public fun delegate_admin(cap: &AdminCap, ctx: &mut TxContext): AdminCap {
+    AdminCap {
+        id: object::new(ctx),
+        market_id: cap.market_id,
+    }
 }
 
 public fun claim_yes(market: &mut Market, yes_token: Coin<YES>, ctx: &mut TxContext): Coin<SUI> {

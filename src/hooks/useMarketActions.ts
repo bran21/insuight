@@ -4,6 +4,7 @@ import {
   buildMintSharesTx,
   buildBuyYesTx,
   buildBuyNoTx,
+  buildDelegateAdminTx,
   buildResolveTx,
   buildClaimYesTx,
   buildClaimNoTx,
@@ -60,6 +61,14 @@ export function useMarketActions() {
     return handleTxResponse(response);
   };
 
+  const delegateAdmin = async (adminCapId: string, delegateAddress: string) => {
+    const tx = buildDelegateAdminTx(adminCapId, delegateAddress);
+    const response = await signAndExecuteTransaction({
+      transaction: tx,
+    });
+    return handleTxResponse(response);
+  };
+
   const claimYes = async (marketId: string, yesTokenId: string, userAddress: string) => {
     const tx = buildClaimYesTx(marketId, yesTokenId, userAddress);
     const response = await signAndExecuteTransaction({
@@ -81,6 +90,7 @@ export function useMarketActions() {
     mintShares,
     buyYes,
     buyNo,
+    delegateAdmin,
     resolveMarket,
     claimYes,
     claimNo,
