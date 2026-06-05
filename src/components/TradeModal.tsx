@@ -14,8 +14,9 @@ interface TradeModalProps {
 
 export default function TradeModal({ market, onClose }: TradeModalProps) {
   const account = useCurrentAccount();
-  const { mintShares } = useMarketActions();
+  const { buyYes, buyNo } = useMarketActions();
   const [amount, setAmount] = useState('');
+  const [activeTab, setActiveTab] = useState<'YES' | 'NO'>('YES');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txDigest, setTxDigest] = useState<string | null>(null);
@@ -32,7 +33,12 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
       setError(null);
       // Convert SUI to MIST (1 SUI = 1,000,000,000 MIST)
       const mistAmount = Math.floor(parseFloat(amount) * 1_000_000_000);
-      const digest = await mintShares(market.id, mistAmount, account.address);
+      let digest;
+      if (activeTab === 'YES') {
+        digest = await buyYes(market.id, mistAmount, account.address);
+      } else {
+        digest = await buyNo(market.id, mistAmount, account.address);
+      }
       setTxDigest(digest);
     } catch (err: any) {
       setError(err.message || 'Failed to execute transaction.');
@@ -42,16 +48,17 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
   };
 
   const amountNum = parseFloat(amount) || 0;
-  // In the custom market, you get 1 YES and 1 NO token for every SUI.
-  // We show them the expected payout if their favored side wins.
-  const expectedPayout = amountNum; // 1:1 payout
+  // Estimate payout based on current prices from the oracle data
+  // If YES price is 60%, 1 SUI buys approximately (1 / 0.6) YES shares
+  const price = activeTab === 'YES' ? market.yesPrice : market.noPrice;
+  const estimatedShares = price > 0 ? (amountNum / (price / 100)).toFixed(2) : '0.00';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/10">
-          <h2 className="text-white font-serif text-xl">Mint Positions</h2>
+          <h2 className="text-white font-serif text-xl">Trade Market</h2>
           <button
             onClick={onClose}
             className="text-white/40 hover:text-white transition-colors"
@@ -76,7 +83,7 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
                 </svg>
               </div>
               <h3 className="text-white font-bold text-lg mb-2">Transaction Successful</h3>
-              <p className="text-white/40 text-sm mb-6">You have successfully minted YES and NO shares.</p>
+              <p className="text-white/40 text-sm mb-6">You have successfully bought {activeTab} shares.</p>
               <a
                 href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
                 target="_blank"
@@ -87,7 +94,28 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
               </a>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <>
+              {/* Tabs */}
+              <div className="flex bg-white/[0.05] p-1 rounded-xl mb-6">
+                <button
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    activeTab === 'YES' ? 'bg-[#22c55e] text-white shadow-lg' : 'text-white/50 hover:text-white'
+                  }`}
+                  onClick={() => setActiveTab('YES')}
+                >
+                  Buy YES ({market.yesPrice}%)
+                </button>
+                <button
+                  className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    activeTab === 'NO' ? 'bg-[#ef4444] text-white shadow-lg' : 'text-white/50 hover:text-white'
+                  }`}
+                  onClick={() => setActiveTab('NO')}
+                >
+                  Buy NO ({market.noPrice}%)
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
               {/* Amount Input */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
@@ -113,12 +141,12 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
               {/* Order Details */}
               <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">You receive</span>
-                  <span className="text-white font-mono">{amountNum} YES + {amountNum} NO</span>
+                  <span className="text-white/40">Estimated Shares</span>
+                  <span className="text-white font-mono">{estimatedShares} {activeTab}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/40">Expected Payout</span>
-                  <span className="text-[#4DA2FF] font-mono font-bold">{expectedPayout} SUI</span>
+                  <span className="text-white/40">Potential Payout</span>
+                  <span className="text-[#4DA2FF] font-mono font-bold">{estimatedShares} SUI</span>
                 </div>
               </div>
 
@@ -132,11 +160,14 @@ export default function TradeModal({ market, onClose }: TradeModalProps) {
               <button
                 type="submit"
                 disabled={isLoading || amountNum <= 0}
-                className="w-full py-3.5 rounded-xl bg-[#4DA2FF] hover:bg-[#3d8fe0] disabled:bg-white/10 disabled:text-white/30 text-white font-bold transition-colors"
+                className={`w-full py-3.5 rounded-xl text-white font-bold transition-colors ${
+                  activeTab === 'YES' ? 'bg-[#22c55e] hover:bg-[#1ea34d]' : 'bg-[#ef4444] hover:bg-[#dc2626]'
+                } disabled:bg-white/10 disabled:text-white/30`}
               >
-                {isLoading ? 'Confirming in Wallet...' : 'Mint Shares'}
+                {isLoading ? 'Confirming in Wallet...' : `Buy ${activeTab} Shares`}
               </button>
             </form>
+            </>
           )}
         </div>
       </div>

@@ -4,7 +4,10 @@ import * as predictApi from '../services/predictApi';
 import MarketCard from './MarketCard';
 import PredictionWidget from './PredictionWidget';
 import TradeModal from './TradeModal';
+import { useCurrentAccount } from '@mysten/dapp-kit';
+import { ADMIN_ADDRESS } from '../constants';
 import CreateMarketModal from './CreateMarketModal';
+import { useCustomMarkets } from '../hooks/useCustomMarkets';
 
 export default function PredictDashboard() {
   const [oracles, setOracles] = useState<OracleState[]>([]);
@@ -14,6 +17,9 @@ export default function PredictDashboard() {
   const [selectedMarket, setSelectedMarket] = useState<any | null>(null);
   const [isCreatingMarket, setIsCreatingMarket] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const account = useCurrentAccount();
+  const isAdmin = account?.address === ADMIN_ADDRESS;
+  const { customMarkets, isLoadingCustomMarkets } = useCustomMarkets();
 
   useEffect(() => {
     async function fetchData() {
@@ -51,7 +57,8 @@ export default function PredictDashboard() {
     });
   };
 
-  const filteredOracles = oracles.filter(o => 
+  const allMarkets = [...customMarkets, ...oracles];
+  const filteredOracles = allMarkets.filter(o => 
     (o.name || o.oracle_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -93,8 +100,16 @@ export default function PredictDashboard() {
           </div>
         </div>
 
-        {/* Right: Search */}
-        <div className="flex items-center w-full lg:w-auto lg:min-w-[280px]">
+        {/* Right: Search & Admin */}
+        <div className="flex items-center gap-3 w-full lg:w-auto lg:min-w-[280px]">
+          {isAdmin && (
+            <button
+              onClick={() => setIsCreatingMarket(true)}
+              className="whitespace-nowrap px-4 py-2 bg-white text-black font-semibold rounded-xl text-sm transition-transform hover:scale-105 active:scale-95"
+            >
+              + Create Market
+            </button>
+          )}
           <div className="relative w-full">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -135,7 +150,7 @@ export default function PredictDashboard() {
         </div>
 
         <div className="predict-grid">
-          {loading ? (
+          {loading && customMarkets.length === 0 && oracles.length === 0 ? (
             Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="market-card market-card--skeleton">
                 <div className="market-card__skeleton-line w-4/5" />

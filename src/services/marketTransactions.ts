@@ -9,14 +9,18 @@ import { CUSTOM_MARKET_PACKAGE } from '../constants';
  * @param description The question/statement for the prediction market
  * @param yesTreasuryId The object ID of the YES token TreasuryCap
  * @param noTreasuryId The object ID of the NO token TreasuryCap
+ * @param initialSuiAmount The amount of SUI (in MIST) to lock for the initial AMM liquidity
  * @returns A Transaction object ready to be signed and executed
  */
 export function buildCreateMarketTx(
   description: string,
   yesTreasuryId: string,
-  noTreasuryId: string
+  noTreasuryId: string,
+  initialSuiAmount: string | number
 ): Transaction {
   const tx = new Transaction();
+
+  const [payment] = tx.splitCoins(tx.gas, [tx.pure.u64(initialSuiAmount)]);
 
   tx.moveCall({
     target: `${CUSTOM_MARKET_PACKAGE}::market::create_market`,
@@ -24,6 +28,7 @@ export function buildCreateMarketTx(
       tx.pure.string(description),
       tx.object(yesTreasuryId),
       tx.object(noTreasuryId),
+      payment,
     ],
   });
 
@@ -57,6 +62,50 @@ export function buildMintSharesTx(
 
   // Transfer the minted coins to the user
   tx.transferObjects([yesCoin, noCoin], tx.pure.address(userAddress));
+
+  return tx;
+}
+
+/**
+ * Builds a transaction for a user to buy YES shares via the AMM.
+ */
+export function buildBuyYesTx(
+  marketId: string,
+  suiAmount: string | number,
+  userAddress: string
+): Transaction {
+  const tx = new Transaction();
+
+  const [payment] = tx.splitCoins(tx.gas, [tx.pure.u64(suiAmount)]);
+
+  const yesCoin = tx.moveCall({
+    target: `${CUSTOM_MARKET_PACKAGE}::market::buy_yes`,
+    arguments: [tx.object(marketId), payment],
+  });
+
+  tx.transferObjects([yesCoin], tx.pure.address(userAddress));
+
+  return tx;
+}
+
+/**
+ * Builds a transaction for a user to buy NO shares via the AMM.
+ */
+export function buildBuyNoTx(
+  marketId: string,
+  suiAmount: string | number,
+  userAddress: string
+): Transaction {
+  const tx = new Transaction();
+
+  const [payment] = tx.splitCoins(tx.gas, [tx.pure.u64(suiAmount)]);
+
+  const noCoin = tx.moveCall({
+    target: `${CUSTOM_MARKET_PACKAGE}::market::buy_no`,
+    arguments: [tx.object(marketId), payment],
+  });
+
+  tx.transferObjects([noCoin], tx.pure.address(userAddress));
 
   return tx;
 }

@@ -2,6 +2,8 @@ import { useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import {
   buildCreateMarketTx,
   buildMintSharesTx,
+  buildBuyYesTx,
+  buildBuyNoTx,
   buildResolveTx,
   buildClaimYesTx,
   buildClaimNoTx,
@@ -18,8 +20,8 @@ export function useMarketActions() {
     }
   };
 
-  const createMarket = async (description: string, yesTreasuryId: string, noTreasuryId: string) => {
-    const tx = buildCreateMarketTx(description, yesTreasuryId, noTreasuryId);
+  const createMarket = async (description: string, yesTreasuryId: string, noTreasuryId: string, initialSuiAmount: string | number) => {
+    const tx = buildCreateMarketTx(description, yesTreasuryId, noTreasuryId, initialSuiAmount);
     const response = await signAndExecuteTransaction({
       transaction: tx,
     });
@@ -28,6 +30,22 @@ export function useMarketActions() {
 
   const mintShares = async (marketId: string, suiAmount: string | number, userAddress: string) => {
     const tx = buildMintSharesTx(marketId, suiAmount, userAddress);
+    const response = await signAndExecuteTransaction({
+      transaction: tx,
+    });
+    return handleTxResponse(response);
+  };
+
+  const buyYes = async (marketId: string, suiAmount: string | number, userAddress: string) => {
+    const tx = buildBuyYesTx(marketId, suiAmount, userAddress);
+    const response = await signAndExecuteTransaction({
+      transaction: tx,
+    });
+    return handleTxResponse(response);
+  };
+
+  const buyNo = async (marketId: string, suiAmount: string | number, userAddress: string) => {
+    const tx = buildBuyNoTx(marketId, suiAmount, userAddress);
     const response = await signAndExecuteTransaction({
       transaction: tx,
     });
@@ -61,6 +79,8 @@ export function useMarketActions() {
   return {
     createMarket,
     mintShares,
+    buyYes,
+    buyNo,
     resolveMarket,
     claimYes,
     claimNo,

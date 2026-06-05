@@ -13,6 +13,7 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
   const [description, setDescription] = useState('');
   const [yesTreasury, setYesTreasury] = useState('');
   const [noTreasury, setNoTreasury] = useState('');
+  const [initialLiquidity, setInitialLiquidity] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
       setError('Please connect your wallet first.');
       return;
     }
-    if (!description || !yesTreasury || !noTreasury) {
+    if (!description || !yesTreasury || !noTreasury || !initialLiquidity) {
       setError('Please fill in all fields.');
       return;
     }
@@ -32,7 +33,8 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
     try {
       setIsLoading(true);
       setError(null);
-      const digest = await createMarket(description, yesTreasury, noTreasury);
+      const mistAmount = Math.floor(parseFloat(initialLiquidity) * 1_000_000_000);
+      const digest = await createMarket(description, yesTreasury, noTreasury, mistAmount);
       setTxDigest(digest);
     } catch (err: any) {
       setError(err.message || 'Failed to create market.');
@@ -118,6 +120,26 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
                   className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors font-mono text-sm"
                   placeholder="0x..."
                 />
+              </div>
+
+              {/* Initial Liquidity Input */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Initial Liquidity (SUI)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  required
+                  value={initialLiquidity}
+                  onChange={(e) => setInitialLiquidity(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors"
+                  placeholder="e.g. 10.0"
+                />
+                <p className="text-white/30 text-xs mt-1">
+                  Required to bootstrap the AMM pool.
+                </p>
               </div>
 
               {error && (

@@ -13,6 +13,7 @@ const EInvalidAdminCap: u64 = 1;
 const EInvalidWinnerSide: u64 = 2;
 const EMarketNotResolved: u64 = 3;
 const EWrongWinningToken: u64 = 4;
+const EZeroAmount: u64 = 5;
 
 public struct Market has key {
     id: UID,
@@ -20,6 +21,8 @@ public struct Market has key {
     vault: Balance<SUI>,
     yes_treasury: TreasuryCap<YES>,
     no_treasury: TreasuryCap<NO>,
+    pool_yes: Balance<YES>,
+    pool_no: Balance<NO>,
     resolved: bool,
     winner: u8, // 0 = unresolved, 1 = YES, 2 = NO
 }
@@ -33,14 +36,29 @@ public fun create_market(
     description: String,
     yes_treasury: TreasuryCap<YES>,
     no_treasury: TreasuryCap<NO>,
+    payment: Coin<SUI>,
     ctx: &mut TxContext
 ) {
+    let amount = payment.value();
+    assert!(amount > 0, EZeroAmount);
+
+    let mut vault = balance::zero();
+    balance::join(&mut vault, coin::into_balance(payment));
+
+    let mut yes_t = yes_treasury;
+    let mut no_t = no_treasury;
+
+    let pool_yes = coin::into_balance(coin::mint(&mut yes_t, amount, ctx));
+    let pool_no = coin::into_balance(coin::mint(&mut no_t, amount, ctx));
+
     let market = Market {
         id: object::new(ctx),
         description,
-        vault: balance::zero(),
-        yes_treasury,
-        no_treasury,
+        vault,
+        yes_treasury: yes_t,
+        no_treasury: no_t,
+        pool_yes,
+        pool_no,
         resolved: false,
         winner: 0,
     };
@@ -55,6 +73,7 @@ public fun create_market(
 public fun mint(market: &mut Market, payment: Coin<SUI>, ctx: &mut TxContext): (Coin<YES>, Coin<NO>) {
     assert!(!market.resolved, EMarketAlreadyResolved);
     let amount = payment.value();
+    assert!(amount > 0, EZeroAmount);
     
     // Lock the SUI collateral
     balance::join(&mut market.vault, coin::into_balance(payment));
@@ -64,6 +83,56 @@ public fun mint(market: &mut Market, payment: Coin<SUI>, ctx: &mut TxContext): (
     let no_coin = coin::mint(&mut market.no_treasury, amount, ctx);
     
     (yes_coin, no_coin)
+}
+
+public fun buy_yes(market: &mut Market, payment: Coin<SUI>, ctx: &mut TxContext): Coin<YES> {
+    assert!(!market.resolved, EMarketAlreadyResolved);
+    let amount = payment.value();
+    assert!(amount > 0, EZeroAmount);
+
+    // Lock the SUI collateral
+    balance::join(&mut market.vault, coin::into_balance(payment));
+
+    // Mint equal YES and NO
+    let yes_minted = coin::mint(&mut market.yes_treasury, amount, ctx);
+    let no_minted = coin::mint(&mut market.no_treasury, amount, ctx);
+
+    let pool_yes_val = balance::value(&market.pool_yes) as u128;
+    let pool_no_val = balance::value(&market.pool_no) as u128;
+
+    // amount_out = (amount_in * reserve_out) / (reserve_in + amount_in)
+    let yes_out = (((amount as u128) * pool_yes_val) / (pool_no_val + (amount as u128))) as u64;
+
+    balance::join(&mut market.pool_no, coin::into_balance(no_minted));
+    let mut yes_coin_from_pool = coin::from_balance(balance::split(&mut market.pool_yes, yes_out), ctx);
+
+    coin::join(&mut yes_coin_from_pool, yes_minted);
+    yes_coin_from_pool
+}
+
+public fun buy_no(market: &mut Market, payment: Coin<SUI>, ctx: &mut TxContext): Coin<NO> {
+    assert!(!market.resolved, EMarketAlreadyResolved);
+    let amount = payment.value();
+    assert!(amount > 0, EZeroAmount);
+
+    // Lock the SUI collateral
+    balance::join(&mut market.vault, coin::into_balance(payment));
+
+    // Mint equal YES and NO
+    let yes_minted = coin::mint(&mut market.yes_treasury, amount, ctx);
+    let no_minted = coin::mint(&mut market.no_treasury, amount, ctx);
+
+    let pool_yes_val = balance::value(&market.pool_yes) as u128;
+    let pool_no_val = balance::value(&market.pool_no) as u128;
+
+    // amount_out = (amount_in * reserve_out) / (reserve_in + amount_in)
+    let no_out = (((amount as u128) * pool_no_val) / (pool_yes_val + (amount as u128))) as u64;
+
+    balance::join(&mut market.pool_yes, coin::into_balance(yes_minted));
+    let mut no_coin_from_pool = coin::from_balance(balance::split(&mut market.pool_no, no_out), ctx);
+
+    coin::join(&mut no_coin_from_pool, no_minted);
+    no_coin_from_pool
 }
 
 public fun resolve(market: &mut Market, cap: &AdminCap, winner: u8) {
