@@ -21,8 +21,15 @@ export function useMarketActions() {
     }
   };
 
-  const createMarket = async (description: string, yesTreasuryId: string, noTreasuryId: string, initialSuiAmount: string | number) => {
-    const tx = buildCreateMarketTx(description, yesTreasuryId, noTreasuryId, initialSuiAmount);
+  const createMarket = async (
+    description: string,
+    endTime: number,
+    resolver: string,
+    yesTreasuryId: string,
+    noTreasuryId: string,
+    initialSuiAmount: string | number
+  ) => {
+    const tx = buildCreateMarketTx(description, endTime, resolver, yesTreasuryId, noTreasuryId, initialSuiAmount);
     const response = await signAndExecuteTransaction({
       transaction: tx,
     });

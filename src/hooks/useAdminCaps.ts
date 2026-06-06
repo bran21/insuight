@@ -44,7 +44,11 @@ export function useAdminCaps() {
 
     fetchAdminCaps();
     const interval = setInterval(fetchAdminCaps, 15000);
-    return () => clearInterval(interval);
+    window.addEventListener('refreshMarkets', fetchAdminCaps);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('refreshMarkets', fetchAdminCaps);
+    };
   }, [suiClient, account]);
 
   return { adminCaps, isLoadingAdminCaps: isLoading };

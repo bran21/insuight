@@ -20,6 +20,7 @@ export default function AdminDashboard() {
       setResolvingId(marketId);
       setError(null);
       await resolveMarket(marketId, adminCapId, winner);
+      setTimeout(() => window.dispatchEvent(new Event('refreshMarkets')), 1500);
       // Let the hooks refresh data automatically
     } catch (err: any) {
       setError(err.message || 'Failed to resolve market');
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
       setResolvingId(marketId);
       setError(null);
       await delegateAdmin(adminCapId, delegateAddress);
+      setTimeout(() => window.dispatchEvent(new Event('refreshMarkets')), 1500);
       setDelegateAddress('');
       setDelegatingId(null);
       setError('Successfully delegated admin capabilities to ' + delegateAddress);

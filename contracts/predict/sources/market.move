@@ -18,6 +18,8 @@ const EZeroAmount: u64 = 5;
 public struct Market has key {
     id: UID,
     description: String,
+    end_time: u64,
+    resolver: address,
     vault: Balance<SUI>,
     yes_treasury: TreasuryCap<YES>,
     no_treasury: TreasuryCap<NO>,
@@ -34,6 +36,8 @@ public struct AdminCap has key, store {
 
 public fun create_market(
     description: String,
+    end_time: u64,
+    resolver: address,
     yes_treasury: TreasuryCap<YES>,
     no_treasury: TreasuryCap<NO>,
     payment: Coin<SUI>,
@@ -54,6 +58,8 @@ public fun create_market(
     let market = Market {
         id: object::new(ctx),
         description,
+        end_time,
+        resolver,
         vault,
         yes_treasury: yes_t,
         no_treasury: no_t,
@@ -65,6 +71,13 @@ public fun create_market(
     let admin_cap = AdminCap {
         id: object::new(ctx),
         market_id: object::id(&market),
+    };
+    if (resolver != ctx.sender()) {
+        let resolver_cap = AdminCap {
+            id: object::new(ctx),
+            market_id: object::id(&market),
+        };
+        transfer::transfer(resolver_cap, resolver);
     };
     transfer::share_object(market);
     transfer::transfer(admin_cap, ctx.sender());

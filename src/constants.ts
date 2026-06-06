@@ -15,10 +15,12 @@ export const PREDICT_SERVER = '/predict-api'; // proxied via vite to https://pre
 export const PREDICT_SERVER_DIRECT = 'https://predict-server.testnet.mystenlabs.com';
 
 // ─── Custom Market Constants (Pending Deployment) ───
-export const CUSTOM_MARKET_PACKAGE = '0xf0f2c0bc4efefc22a05ff79bb5783abdeaeca71921b4597db88ec02ca490b5e1'; // Deployed predict package
+export const CUSTOM_MARKET_PACKAGE = '0x84bee788cd260e3c5697d0047856a5f596f8d2aee9baa3dc578266f3466ff78d'; // Deployed predict package
 export const CUSTOM_MARKET_YES_TYPE = `${CUSTOM_MARKET_PACKAGE}::yes::YES`;
 export const CUSTOM_MARKET_NO_TYPE = `${CUSTOM_MARKET_PACKAGE}::no::NO`;
 
 // ─── Insuight Agent Constants ───
 export const INSUIGHT_PACKAGE = '0xa40e0dc106887a4e18aeb5c0e7195b6859d9f8f228acc3552d316159a96b4b20'; // Deployed insuight package
+export const YES_TREASURY_CAP = '0x39a137030061b48e25ac45aa42748856466b30ed2ae22d793160374b864abc6b';
+export const NO_TREASURY_CAP = '0xf1aa861a660e705a4c3f1c9a3ab41bb75c9922ad3dd8a6ebf0d6f7118ab20f11';
 export const ADMIN_ADDRESS = '0x2e1666ae83f393acc2db2ff53255f09a1ebe30a1d8036a9da5d3b5abdb7cbbb0'; // Deployer address

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useMarketActions } from '../hooks/useMarketActions';
+import { YES_TREASURY_CAP, NO_TREASURY_CAP, ADMIN_ADDRESS } from '../constants';
+
 
 interface CreateMarketModalProps {
   onClose: () => void;
@@ -11,9 +13,9 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
   const { createMarket } = useMarketActions();
   
   const [description, setDescription] = useState('');
-  const [yesTreasury, setYesTreasury] = useState('');
-  const [noTreasury, setNoTreasury] = useState('');
   const [initialLiquidity, setInitialLiquidity] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [resolver, setResolver] = useState(ADMIN_ADDRESS);
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
       setError('Please connect your wallet first.');
       return;
     }
-    if (!description || !yesTreasury || !noTreasury || !initialLiquidity) {
+    if (!description || !initialLiquidity || !endTime || !resolver) {
       setError('Please fill in all fields.');
       return;
     }
@@ -33,9 +35,14 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
     try {
       setIsLoading(true);
       setError(null);
+      const endTimestamp = new Date(endTime).getTime();
       const mistAmount = Math.floor(parseFloat(initialLiquidity) * 1_000_000_000);
-      const digest = await createMarket(description, yesTreasury, noTreasury, mistAmount);
+      const digest = await createMarket(description, endTimestamp, resolver, YES_TREASURY_CAP, NO_TREASURY_CAP, mistAmount);
       setTxDigest(digest);
+      // Wait a moment for RPC to index, then trigger a refresh of markets
+      setTimeout(() => {
+        window.dispatchEvent(new Event('refreshMarkets'));
+      }, 1500);
     } catch (err: any) {
       setError(err.message || 'Failed to create market.');
     } finally {
@@ -94,33 +101,6 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
-                  YES TreasuryCap Object ID
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={yesTreasury}
-                  onChange={(e) => setYesTreasury(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors font-mono text-sm"
-                  placeholder="0x..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
-                  NO TreasuryCap Object ID
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={noTreasury}
-                  onChange={(e) => setNoTreasury(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors font-mono text-sm"
-                  placeholder="0x..."
-                />
-              </div>
 
               {/* Initial Liquidity Input */}
               <div>
@@ -139,6 +119,36 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
                 />
                 <p className="text-white/30 text-xs mt-1">
                   Required to bootstrap the AMM pool.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  End Time (Expiry)
+                </label>
+                <input
+                  type="datetime-local"
+                  required
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Resolver Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={resolver}
+                  onChange={(e) => setResolver(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors"
+                  placeholder="0x..."
+                />
+                <p className="text-white/30 text-xs mt-1">
+                  The AI Agent or wallet address authorized to resolve this market.
                 </p>
               </div>
 

@@ -56,8 +56,8 @@ export function useCustomMarkets() {
                 name: fields.description || `Custom Market ${obj.data.objectId.slice(0, 8)}`,
                 spot: 0.5,
                 forward: 0.5,
-                expiry: Date.now() + 86400000 * 30, // Default to 30 days in future for UI
-                expiry_date: new Date(Date.now() + 86400000 * 30).toISOString(),
+                expiry: Number(fields.end_time),
+                expiry_date: new Date(Number(fields.end_time)).toISOString(),
                 status: fields.resolved ? 'settled' : 'active',
                 isCustom: true // Useful flag for UI rendering if we want
               } as OracleState & { isCustom: boolean };
@@ -76,7 +76,11 @@ export function useCustomMarkets() {
 
     fetchCustomMarkets();
     const interval = setInterval(fetchCustomMarkets, 15000);
-    return () => clearInterval(interval);
+    window.addEventListener('refreshMarkets', fetchCustomMarkets);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('refreshMarkets', fetchCustomMarkets);
+    };
   }, [suiClient]);
 
   return { customMarkets, isLoadingCustomMarkets: isLoading };

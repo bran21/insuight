@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { OracleState } from '../services/predictApi';
 import * as predictApi from '../services/predictApi';
 import MarketCard from './MarketCard';
-import PredictionWidget from './PredictionWidget';
+
 import TradeModal from './TradeModal';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { ADMIN_ADDRESS } from '../constants';
@@ -77,58 +77,63 @@ export default function PredictDashboard() {
   return (
     <div className="predict-dashboard">
 
-      {/* ── Header Row ── */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-4 mb-8 mt-2 animate-fade-in-up">
-        
-        {/* Left: Title & Categories */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full lg:w-auto scrollbar-hide">
-          <div className="flex items-center gap-2">
-            {DISPLAY_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 border ${
-                  activeCategory === cat.id || (activeCategory === 'all' && cat.id === 'trending')
-                    ? 'bg-white text-black border-white' 
-                    : 'bg-[#1a1a1a] text-gray-400 border-white/5 hover:bg-[#252525] hover:text-white'
-                }`}
-                onClick={() => setActiveCategory(cat.id as any)}
-              >
-                {cat.icon && <span>{cat.icon}</span>}
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* ── Top Control Bar (Polymarket-style) ── */}
+      <div className="market-control-bar animate-fade-in-up">
+        {/* Row 1: Active tab + Search + Admin */}
+        <div className="market-control-bar__top">
+          <button
+            className={`market-control-bar__active-tab ${
+              activeCategory === 'all' || activeCategory === 'trending' ? 'market-control-bar__active-tab--on' : ''
+            }`}
+            onClick={() => setActiveCategory('all')}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            Top
+          </button>
 
-        {/* Right: Search & Admin */}
-        <div className="flex items-center gap-3 w-full lg:w-auto lg:min-w-[280px]">
+          <div className="market-control-bar__search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="market-control-bar__search-icon">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by markets"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="market-control-bar__search-input"
+            />
+          </div>
+
           {isAdmin && (
             <button
               onClick={() => setIsCreatingMarket(true)}
-              className="whitespace-nowrap px-4 py-2 bg-white text-black font-semibold rounded-xl text-sm transition-transform hover:scale-105 active:scale-95"
+              className="market-control-bar__create-btn"
             >
-              + Create Market
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Create Market
             </button>
           )}
-          <div className="relative w-full">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Search markets or profiles" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-colors"
-            />
-          </div>
+        </div>
+
+        {/* Row 2: Scrollable category tags */}
+        <div className="market-control-bar__tags">
+          {DISPLAY_CATEGORIES.filter(c => c.id !== 'trending').map((cat) => (
+            <button
+              key={cat.id}
+              className={`market-control-bar__tag ${activeCategory === cat.id ? 'market-control-bar__tag--active' : ''}`}
+              onClick={() => setActiveCategory(cat.id)}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
       </div>
-
-      {/* ── Featured AI Signal ── */}
-      <section className="mb-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-        <PredictionWidget />
-      </section>
 
 
       {/* ── Error ── */}

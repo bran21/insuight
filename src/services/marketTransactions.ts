@@ -14,6 +14,8 @@ import { CUSTOM_MARKET_PACKAGE } from '../constants';
  */
 export function buildCreateMarketTx(
   description: string,
+  endTime: number,
+  resolver: string,
   yesTreasuryId: string,
   noTreasuryId: string,
   initialSuiAmount: string | number
@@ -26,6 +28,8 @@ export function buildCreateMarketTx(
     target: `${CUSTOM_MARKET_PACKAGE}::market::create_market`,
     arguments: [
       tx.pure.string(description),
+      tx.pure.u64(endTime),
+      tx.pure.address(resolver),
       tx.object(yesTreasuryId),
       tx.object(noTreasuryId),
       payment,
