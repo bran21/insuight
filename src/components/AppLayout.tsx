@@ -1,9 +1,14 @@
 import { Outlet } from 'react-router-dom';
 import { Sidebar, TopBar, MobileNav } from './Navbar';
 
+import FloatingAgentWidget from './FloatingAgentWidget';
+
 export default function AppLayout() {
   return (
     <div className="app-layout">
+      {/* Floating Agent Widget (Friar) */}
+      <FloatingAgentWidget />
+
       {/* Desktop Sidebar */}
       <Sidebar />
 

@@ -36,8 +36,8 @@ export default function MarketCard({ oracle, index, onClick }: MarketCardProps) 
       {/* Header */}
       <div className="market-card__header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span className="market-card__category market-card__category--crypto">
-            CRYPTO
+          <span className={`market-card__category market-card__category--${(oracle.category || 'crypto').toLowerCase()}`}>
+            {(oracle.category || 'CRYPTO').toUpperCase()}
           </span>
           {isActive && (
             <span className="badge badge-green">

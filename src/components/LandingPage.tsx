@@ -81,10 +81,10 @@ export default function LandingPage() {
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
             <div style={{
               width: 28, height: 28, borderRadius: 8,
-              background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 12px rgba(26,26,26,0.1)',
+              background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 12px rgba(99,102,241,0.3)',
             }}>
-              <span style={{ color: 'var(--color-text-inverse)', fontFamily: "'DM Serif Display', serif", fontWeight: 700, fontSize: 14 }}>I</span>
+              <img src="/insuight-logo.svg" alt="Insuight" width="18" height="18" />
             </div>
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 16, color: 'var(--color-text-primary)' }}>Insuight</span>
           </Link>
@@ -290,7 +290,7 @@ export default function LandingPage() {
           position: 'relative', overflow: 'hidden',
           borderRadius: 24, border: '1px solid var(--color-border)',
           padding: '64px 32px', textAlign: 'center',
-          background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(250,248,246,1) 50%, rgba(255,255,255,0.7) 100%)',
+          background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%)',
         }}>
           {/* Top glow */}
           <div style={{
@@ -327,8 +327,8 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid var(--color-border)', padding: '20px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 20, height: 20, borderRadius: 5, background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: 'var(--color-text-inverse)', fontFamily: "'DM Serif Display', serif", fontWeight: 700, fontSize: 10 }}>I</span>
+            <div style={{ width: 20, height: 20, borderRadius: 5, background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src="/insuight-logo.svg" alt="Insuight" width="13" height="13" />
             </div>
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 13, color: 'var(--color-text-secondary)' }}>Insuight</span>
             <span style={{ fontSize: 11, color: 'var(--color-text-muted)', marginLeft: 4 }}>© 2026</span>

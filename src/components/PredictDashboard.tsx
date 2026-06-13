@@ -9,6 +9,54 @@ import { ADMIN_ADDRESS } from '../constants';
 import CreateMarketModal from './CreateMarketModal';
 import { useCustomMarkets } from '../hooks/useCustomMarkets';
 
+// Mock prediction market questions for on-chain oracles without names
+const MOCK_MARKETS: { name: string; category: string }[] = [
+  { name: 'Will Bitcoin reach $100,000 by end of 2026?', category: 'crypto' },
+  { name: 'Will Ethereum surpass $5,000 before Q3 2026?', category: 'crypto' },
+  { name: 'Will SUI reach $10 by December 2026?', category: 'crypto' },
+  { name: 'Will the Fed cut interest rates before June 2026?', category: 'politics' },
+  { name: 'Will SpaceX Starship complete an orbital flight in 2026?', category: 'tech' },
+  { name: 'Will Apple release AR glasses in 2026?', category: 'tech' },
+  { name: 'Will GPT-7 be released before March 2027?', category: 'tech' },
+  { name: 'Will Bitcoin reach $150,000 by end of 2025?', category: 'crypto' },
+  { name: 'Will the US enter a recession in 2026?', category: 'economy' },
+  { name: 'Will Solana flip Ethereum in market cap?', category: 'crypto' },
+  { name: 'Will there be a new COVID variant of concern in 2026?', category: 'science' },
+  { name: 'Will the S&P 500 hit a new all-time high in Q3 2026?', category: 'economy' },
+  { name: 'Will Tesla release a sub-$25,000 EV in 2026?', category: 'tech' },
+  { name: 'Will a major country adopt Bitcoin as legal tender in 2026?', category: 'politics' },
+  { name: 'Will the 2026 FIFA World Cup break viewership records?', category: 'sports' },
+  { name: 'Will OpenAI reach $100B valuation by mid-2026?', category: 'tech' },
+  { name: 'Will gold reach $3,000/oz in 2026?', category: 'economy' },
+  { name: 'Will NVIDIA remain the top chipmaker by revenue?', category: 'tech' },
+  { name: 'Will Dogecoin reach $1 by end of 2026?', category: 'crypto' },
+  { name: 'Will the next iPhone include a foldable display?', category: 'tech' },
+];
+
+/** Deterministic hash from oracle ID to pick a mock market */
+function hashId(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+/** Enrich oracles that lack a human-readable name */
+function enrichOracles(oracles: OracleState[]): OracleState[] {
+  return oracles.map((o, idx) => {
+    if (o.name && !o.name.startsWith('Market 0x') && !o.name.startsWith('Custom Market')) {
+      return o;
+    }
+    const mock = MOCK_MARKETS[(hashId(o.oracle_id) + idx) % MOCK_MARKETS.length];
+    return {
+      ...o,
+      name: mock.name,
+      category: o.category || mock.category,
+    };
+  });
+}
+
 export default function PredictDashboard() {
   const [oracles, setOracles] = useState<OracleState[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +105,7 @@ export default function PredictDashboard() {
     });
   };
 
-  const allMarkets = [...customMarkets, ...oracles];
+  const allMarkets = [...enrichOracles(customMarkets), ...enrichOracles(oracles)];
 
   const now = Date.now();
   const closingSoonMarkets = [...allMarkets]

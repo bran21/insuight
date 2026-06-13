@@ -14,16 +14,7 @@ const SIDEBAR_LINKS = [
       </svg>
     ),
   },
-  {
-    to: '/app/agent',
-    label: 'AI Agent',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-      </svg>
-    ),
-  },
+
   {
     to: '/app/portfolio',
     label: 'Portfolio',
@@ -87,7 +78,7 @@ const SECONDARY_LINKS = [
 // Mobile nav uses a flattened list
 const ALL_NAV_LINKS = [
   { to: '/app', label: 'Markets' },
-  { to: '/app/agent', label: 'AI Agent' },
+
   { to: '/app/portfolio', label: 'Portfolio' },
   { to: '/app/leaderboard', label: 'Leaderboard' },
   { to: '/app/competitions', label: 'Competitions' },
@@ -100,11 +91,7 @@ export function Sidebar() {
       {/* Logo */}
       <NavLink to="/app" className="sidebar-logo">
         <div className="sidebar-logo__icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="12" r="6" />
-            <circle cx="12" cy="12" r="2" />
-          </svg>
+          <img src="/insuight-logo.svg" alt="Insuight" width="22" height="22" />
         </div>
         <span className="sidebar-logo__text">Insuight</span>
       </NavLink>
@@ -205,11 +192,7 @@ export function MobileNav() {
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <NavLink to="/app" className="flex items-center gap-2 text-white">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="6" />
-              <circle cx="12" cy="12" r="2" />
-            </svg>
+            <img src="/insuight-logo.svg" alt="Insuight" width="18" height="18" />
           </div>
           <span className="font-sans text-lg font-bold tracking-tight">Insuight</span>
         </NavLink>
