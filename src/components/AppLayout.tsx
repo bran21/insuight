@@ -1,14 +1,21 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from './Navbar';
+import { Sidebar, TopBar, MobileNav } from './Navbar';
 
 export default function AppLayout() {
   return (
     <div className="app-layout">
-      {/* Top Navbar */}
-      <Navbar />
+      {/* Desktop Sidebar */}
+      <Sidebar />
 
-      {/* Main Content */}
+      {/* Mobile Nav (hamburger + drawer) */}
+      <MobileNav />
+
+      {/* Main Content Area */}
       <div className="app-content">
+        {/* Desktop Top Bar */}
+        <TopBar />
+
+        {/* Page Content */}
         <main className="app-main">
           <Outlet />
         </main>

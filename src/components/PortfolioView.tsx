@@ -8,7 +8,7 @@ export default function PortfolioView() {
     {
       id: '1',
       question: 'Will Bitcoin reach $86,000 by July 2026?',
-      category: 'crypto',
+      category: 'Crypto',
       position: 'YES' as const,
       shares: 120,
       avgCost: 0.52,
@@ -22,7 +22,7 @@ export default function PortfolioView() {
     {
       id: '2',
       question: 'Will SUI reach $5 before August 2026?',
-      category: 'crypto',
+      category: 'Crypto',
       position: 'YES' as const,
       shares: 80,
       avgCost: 0.58,
@@ -36,7 +36,7 @@ export default function PortfolioView() {
     {
       id: '3',
       question: 'Will the Fed cut rates before July?',
-      category: 'politics',
+      category: 'Politics',
       position: 'NO' as const,
       shares: 200,
       avgCost: 0.68,
@@ -50,7 +50,7 @@ export default function PortfolioView() {
     {
       id: '4',
       question: 'Will Ethereum dip below $2,500?',
-      category: 'crypto',
+      category: 'Crypto',
       position: 'NO' as const,
       shares: 150,
       avgCost: 0.74,
@@ -64,7 +64,7 @@ export default function PortfolioView() {
     {
       id: '5',
       question: 'Will GPT-5.6 be released by June 8, 2026?',
-      category: 'science',
+      category: 'Science',
       position: 'YES' as const,
       shares: 50,
       avgCost: 0.40,
@@ -78,7 +78,7 @@ export default function PortfolioView() {
     {
       id: '6',
       question: 'Will a Category 5 hurricane hit the US in 2026?',
-      category: 'weather',
+      category: 'Weather',
       position: 'YES' as const,
       shares: 60,
       avgCost: 0.35,
@@ -95,196 +95,173 @@ export default function PortfolioView() {
   const totalValue = holdings.reduce((sum, h) => sum + h.currentValue, 0);
   const totalPnL = totalValue - totalInvested;
   const activeCount = holdings.filter(h => h.status === 'active').length;
+  const pnlPercent = ((totalPnL / totalInvested) * 100).toFixed(1);
+
+  const metrics = [
+    {
+      label: 'Portfolio Value',
+      value: `$${totalValue.toFixed(0)}`,
+      sub: <><span className="portfolio-metric__badge portfolio-metric__badge--up">↑ {pnlPercent}%</span> <span className="portfolio-metric__hint">all time</span></>,
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      ),
+      accent: 'indigo',
+    },
+    {
+      label: 'Total P&L',
+      value: `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`,
+      sub: <span className="portfolio-metric__hint" style={{ color: 'var(--color-green)' }}>Realized + Unrealized</span>,
+      icon: <span style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>$</span>,
+      accent: 'green',
+      valueColor: totalPnL >= 0 ? 'var(--color-green)' : 'var(--color-red)',
+    },
+    {
+      label: 'Open Positions',
+      value: `${activeCount}`,
+      sub: <span className="portfolio-metric__hint">Across 3 categories</span>,
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      ),
+      accent: 'blue',
+    },
+    {
+      label: 'Win Rate',
+      value: '60.2%',
+      sub: <span className="portfolio-metric__hint">Based on resolved markets</span>,
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      ),
+      accent: 'amber',
+    },
+  ];
 
   return (
-    <div className="relative min-h-[calc(100vh-80px)] pt-12 md:pt-20 pb-20 px-4 md:px-8 max-w-[1440px] mx-auto w-full flex flex-col">
-      {/* Background ambient glow effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
-
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 animate-fade-in-up">
-        <div className="space-y-1">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
-            Portfolio
-          </h1>
-          <p className="text-gray-400 font-medium">
-            Track and manage your prediction market positions
-          </p>
+    <div className="portfolio-page">
+      {/* Header */}
+      <div className="portfolio-header">
+        <div>
+          <h1 className="portfolio-title">Portfolio</h1>
+          <p className="portfolio-subtitle">Your open positions and performance</p>
         </div>
-        <button className="group mt-6 md:mt-0 relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-indigo-600/90 border border-indigo-500/50 rounded-xl hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] overflow-hidden">
-          <span className="relative z-10 flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
-            Add Position
-          </span>
+        <button className="portfolio-add-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+          Add Position
         </button>
       </div>
 
-      {/* Dashboard Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-        {/* Metric Card 1 */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-indigo-500/30 transition-colors group" style={{ animationDelay: '0.05s' }}>
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50" />
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Portfolio Value</p>
-            <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500/20 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      {/* Metric Cards */}
+      <div className="portfolio-metrics">
+        {metrics.map((m, i) => (
+          <div key={m.label} className={`portfolio-metric portfolio-metric--${m.accent}`} style={{ animationDelay: `${i * 0.06}s` }}>
+            <div className="portfolio-metric__top">
+              <span className="portfolio-metric__label">{m.label}</span>
+              <div className={`portfolio-metric__icon portfolio-metric__icon--${m.accent}`}>{m.icon}</div>
             </div>
+            <h2 className="portfolio-metric__value" style={m.valueColor ? { color: m.valueColor } : undefined}>{m.value}</h2>
+            <div className="portfolio-metric__sub">{m.sub}</div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">${totalValue.toFixed(2)}</h2>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-500/20 text-green-400 border border-green-500/20">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="mr-0.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-                7.4%
-              </span>
-              <span className="text-xs text-gray-500 font-medium">all time</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Metric Card 2 */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-emerald-500/30 transition-colors group" style={{ animationDelay: '0.1s' }}>
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-50" />
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total P&L</p>
-            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
-              <span className="font-mono text-base font-bold">$</span>
-            </div>
-          </div>
-          <div>
-            <h2 className={`text-3xl font-bold font-mono tracking-tight ${totalPnL >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
-            </h2>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="text-xs text-emerald-400/80 font-medium">Realized & Unrealized</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Metric Card 3 */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-blue-500/30 transition-colors group" style={{ animationDelay: '0.15s' }}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Positions</p>
-            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500/20 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">{activeCount}</h2>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="text-xs text-gray-500 font-medium">Across 3 categories</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Metric Card 4 */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-amber-500/30 transition-colors group" style={{ animationDelay: '0.2s' }}>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Win Rate</p>
-            <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">60.2%</h2>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="text-xs text-gray-500 font-medium">Based on resolved markets</span>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Chart Section */}
-      <div className="mb-8 rounded-2xl bg-[#121212] border border-white/5 overflow-hidden shadow-2xl animate-fade-in-up relative" style={{ animationDelay: '0.25s' }}>
-        <div className="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-          <h2 className="text-base font-bold text-white tracking-wide">Performance History</h2>
-          <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-lg border border-white/5">
-            {['1W', '1M', '3M', 'YTD', 'ALL'].map(t => (
-              <button key={t} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${t === '1M' ? 'bg-indigo-500/20 text-indigo-400 shadow-sm border border-indigo-500/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>
+      {/* Chart */}
+      <div className="portfolio-chart-card">
+        <div className="portfolio-chart-card__header">
+          <h3 className="portfolio-chart-card__title">Portfolio Value Over Time</h3>
+          <div className="portfolio-chart-card__tabs">
+            {['1W', '1M', '3M', 'All'].map(t => (
+              <button key={t} className={`portfolio-chart-card__tab${t === '1M' ? ' portfolio-chart-card__tab--active' : ''}`}>
                 {t}
               </button>
             ))}
           </div>
         </div>
-        <div className="p-6 h-[280px] w-full relative">
-          {/* SVG Chart Line */}
-          <svg preserveAspectRatio="none" className="w-full h-full relative z-10" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 150 C 100 130, 200 170, 300 120 C 400 70, 500 140, 600 100 C 700 60, 800 80, 800 80 L 800 200 L 0 200 Z" fill="url(#chart_gradient)" fillOpacity="1"/>
-            <path d="M0 150 C 100 130, 200 170, 300 120 C 400 70, 500 140, 600 100 C 700 60, 800 80, 800 80" stroke="#818cf8" strokeWidth="3" strokeLinecap="round"/>
-            <defs>
-              <linearGradient id="chart_gradient" x1="400" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#818cf8" stopOpacity="0.25"/>
-                <stop offset="1" stopColor="#818cf8" stopOpacity="0"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="absolute inset-x-6 bottom-4 flex justify-between text-[10px] font-mono text-gray-500 tracking-widest uppercase z-10">
-            <span>Feb 16</span><span>Feb 20</span><span>Feb 24</span><span>Feb 28</span><span>Mar 4</span><span>Mar 8</span><span>Mar 12</span><span>Mar 16</span>
+        <div className="portfolio-chart-card__body">
+          {/* Y-axis labels */}
+          <div className="portfolio-chart-card__yaxis">
+            <span>100¢</span><span>75¢</span><span>50¢</span><span>25¢</span>
+          </div>
+          {/* Chart area */}
+          <div className="portfolio-chart-card__canvas">
+            <svg preserveAspectRatio="none" className="portfolio-chart-card__svg" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Subtle horizontal grid lines */}
+              <line x1="0" y1="50" x2="800" y2="50" stroke="rgba(255,255,255,0.04)" strokeWidth="1"/>
+              <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(255,255,255,0.04)" strokeWidth="1"/>
+              <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.04)" strokeWidth="1"/>
+              {/* Green line (portfolio) */}
+              <path d="M0 120 C 50 115, 100 110, 150 105 C 200 100, 250 95, 300 90 C 350 88, 400 85, 450 82 C 500 78, 550 80, 600 75 C 650 70, 700 65, 750 60 C 775 58, 800 55, 800 55" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round"/>
+              <path d="M0 120 C 50 115, 100 110, 150 105 C 200 100, 250 95, 300 90 C 350 88, 400 85, 450 82 C 500 78, 550 80, 600 75 C 650 70, 700 65, 750 60 C 775 58, 800 55, 800 55 L 800 200 L 0 200 Z" fill="url(#portfolio_grad_green)" fillOpacity="1"/>
+              {/* Red line (benchmark) */}
+              <path d="M0 140 C 80 145, 160 150, 240 148 C 320 146, 400 142, 480 144 C 560 146, 640 140, 720 138 C 760 137, 800 135, 800 135" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeDasharray="6 4" opacity="0.6"/>
+              <defs>
+                <linearGradient id="portfolio_grad_green" x1="400" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#22c55e" stopOpacity="0.15"/>
+                  <stop offset="1" stopColor="#22c55e" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            {/* X-axis dates */}
+            <div className="portfolio-chart-card__xaxis">
+              {['Feb 16', 'Feb 18', 'Feb 20', 'Feb 22', 'Feb 24', 'Feb 26', 'Feb 28', 'Mar 1', 'Mar 2', 'Mar 3', 'Mar 4', 'Mar 5', 'Mar 6', 'Mar 7', 'Mar 8', 'Mar 9', 'Mar 11', 'Mar 15', 'Mar 17'].filter((_, i) => i % 3 === 0).map(d => (
+                <span key={d}>{d}</span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Positions Table */}
-      <div className="rounded-2xl bg-[#121212] border border-white/5 overflow-hidden shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-        <div className="px-6 py-5 border-b border-white/5">
-          <h2 className="text-base font-bold text-white tracking-wide">Current Positions</h2>
+      {/* Open Positions */}
+      <div className="portfolio-positions-card">
+        <div className="portfolio-positions-card__header">
+          <h3 className="portfolio-positions-card__title">Open Positions</h3>
+          <span className="portfolio-positions-card__count">{holdings.length} positions</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+        <div className="portfolio-positions-card__table-wrap">
+          <table className="portfolio-table">
             <thead>
-              <tr className="bg-black/20">
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">Market</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Side</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Shares</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Avg Price</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Current</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Value</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Return</th>
-                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+              <tr>
+                <th className="portfolio-table__th portfolio-table__th--market">Market</th>
+                <th className="portfolio-table__th portfolio-table__th--center">Side</th>
+                <th className="portfolio-table__th portfolio-table__th--right">Shares</th>
+                <th className="portfolio-table__th portfolio-table__th--right">Avg</th>
+                <th className="portfolio-table__th portfolio-table__th--right">Current</th>
+                <th className="portfolio-table__th portfolio-table__th--right">Value</th>
+                <th className="portfolio-table__th portfolio-table__th--right">P&L</th>
+                <th className="portfolio-table__th portfolio-table__th--right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody>
               {holdings.map((h) => {
                 const pnl = h.currentValue - h.invested;
-                const pnlPercent = (pnl / h.invested) * 100;
+                const pnlPct = (pnl / h.invested) * 100;
                 const isUp = pnl >= 0;
 
                 return (
-                  <tr key={h.id} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="py-4 px-6">
-                      <div className="font-semibold text-white text-sm line-clamp-1 group-hover:text-indigo-400 transition-colors">
-                        {h.question}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1 capitalize">{h.category}</div>
+                  <tr key={h.id} className="portfolio-table__row">
+                    <td className="portfolio-table__td portfolio-table__td--market">
+                      <div className="portfolio-table__question">{h.question}</div>
+                      <div className="portfolio-table__category">{h.category}</div>
                     </td>
-                    <td className="py-4 px-6 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
-                        h.position === 'YES' 
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
-                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                      }`}>
+                    <td className="portfolio-table__td portfolio-table__td--center">
+                      <span className={`portfolio-table__side portfolio-table__side--${h.position.toLowerCase()}`}>
                         {h.position}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-gray-300">{h.shares}</td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-gray-400">{h.avgCost.toFixed(2)}¢</td>
-                    <td className="py-4 px-6 text-right font-mono text-sm text-white">{h.currentPrice.toFixed(2)}¢</td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="font-mono font-bold text-sm text-white">${h.currentValue.toFixed(2)}</div>
-                      <div className="font-mono text-[10px] text-gray-500 mt-1">Invested: ${h.invested.toFixed(2)}</div>
+                    <td className="portfolio-table__td portfolio-table__td--right portfolio-table__td--mono">{h.shares}</td>
+                    <td className="portfolio-table__td portfolio-table__td--right portfolio-table__td--mono portfolio-table__td--muted">{h.avgCost.toFixed(2)}¢</td>
+                    <td className="portfolio-table__td portfolio-table__td--right portfolio-table__td--mono">{h.currentPrice.toFixed(2)}¢</td>
+                    <td className="portfolio-table__td portfolio-table__td--right">
+                      <div className="portfolio-table__td--mono portfolio-table__td--bold">${h.currentValue.toFixed(2)}</div>
                     </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className={`font-mono font-bold text-sm ${isUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                    <td className="portfolio-table__td portfolio-table__td--right">
+                      <div className={`portfolio-table__pnl ${isUp ? 'portfolio-table__pnl--up' : 'portfolio-table__pnl--down'}`}>
                         {isUp ? '+' : ''}${pnl.toFixed(2)}
                       </div>
-                      <div className={`font-mono text-[11px] mt-1 ${isUp ? 'text-emerald-400/80' : 'text-red-400/80'}`}>
-                        {isUp ? '+' : ''}{pnlPercent.toFixed(1)}%
+                      <div className={`portfolio-table__pnl-pct ${isUp ? 'portfolio-table__pnl--up' : 'portfolio-table__pnl--down'}`}>
+                        {isUp ? '+' : ''}{pnlPct.toFixed(1)}%
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-right">
-                      <button className="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-white/10 text-white hover:bg-indigo-500 hover:border-indigo-400 transition-all">
-                        Trade
-                      </button>
+                    <td className="portfolio-table__td portfolio-table__td--right">
+                      <button className="portfolio-table__trade-btn">Trade</button>
                     </td>
                   </tr>
                 );
