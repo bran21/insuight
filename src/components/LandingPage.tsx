@@ -4,17 +4,37 @@ import { useEffect, useState } from 'react';
 /* ── Static data ── */
 const FEATURES = [
   {
-    icon: '\u{1F4B3}', // 💳
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="7" width="16" height="4" rx="2" fill="#2563eb" />
+        <rect x="6" y="13" width="16" height="4" rx="2" fill="#2563eb" />
+      </svg>
+    ),
     title: 'Institutional Liquidity',
     desc: "DeepBook V3 powers sub-second settlement on Sui's network.",
   },
   {
-    icon: '\u{1F916}', // 🤖
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="10" width="20" height="10" rx="2" />
+        <path d="M12 2v8" />
+        <circle cx="12" cy="2" r="2" />
+        <path d="M6 14h.01" />
+        <path d="M10 14h.01" />
+        <path d="M14 14h.01" />
+        <path d="M18 14h.01" />
+      </svg>
+    ),
     title: 'Autonomous AI Agents',
     desc: 'On-chain signal engine with momentum & mean-reversion models.',
   },
   {
-    icon: '\u{1F6E1}', // 🛡
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    ),
     title: 'Unmatched Security',
     desc: 'Non-custodial. On-chain. Verifiable. Your keys, your funds.',
   },

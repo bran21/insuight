@@ -47,19 +47,25 @@ export function useCustomMarkets() {
           .map((obj) => {
             if (obj.data?.content?.dataType === 'moveObject') {
               const fields = obj.data.content.fields as any;
-              
-              // Calculate a basic implied prob if vault SUI and total supply exist
-              // For a simple UI default, we just use 0.5 (50%)
+              let name = fields.description || `Custom Market ${obj.data.objectId.slice(0, 8)}`;
+              let category: string | undefined = undefined;
+
+              const match = name.match(/^\[(.*?)\]\s*(.*)$/);
+              if (match) {
+                category = match[1].toLowerCase();
+                name = match[2];
+              }
               
               return {
                 oracle_id: obj.data.objectId,
-                name: fields.description || `Custom Market ${obj.data.objectId.slice(0, 8)}`,
+                name: name,
                 spot: 0.5,
                 forward: 0.5,
                 expiry: Number(fields.end_time),
                 expiry_date: new Date(Number(fields.end_time)).toISOString(),
                 status: fields.resolved ? 'settled' : 'active',
-                isCustom: true // Useful flag for UI rendering if we want
+                isCustom: true,
+                category: category
               } as OracleState & { isCustom: boolean };
             }
             return null;

@@ -13,6 +13,7 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
   const { createMarket } = useMarketActions();
   
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('Crypto');
   const [initialLiquidity, setInitialLiquidity] = useState('');
   const [endTime, setEndTime] = useState('');
   const [resolver, setResolver] = useState(ADMIN_ADDRESS);
@@ -37,7 +38,8 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
       setError(null);
       const endTimestamp = new Date(endTime).getTime();
       const mistAmount = Math.floor(parseFloat(initialLiquidity) * 1_000_000_000);
-      const digest = await createMarket(description, endTimestamp, resolver, YES_TREASURY_CAP, NO_TREASURY_CAP, mistAmount);
+      const formattedDescription = `[${category}] ${description}`;
+      const digest = await createMarket(formattedDescription, endTimestamp, resolver, YES_TREASURY_CAP, NO_TREASURY_CAP, mistAmount);
       setTxDigest(digest);
       // Wait a moment for RPC to index, then trigger a refresh of markets
       setTimeout(() => {
@@ -88,6 +90,24 @@ export default function CreateMarketModal({ onClose }: CreateMarketModalProps) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
+                  Category / Theme
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#4DA2FF]/50 transition-colors appearance-none"
+                >
+                  <option value="Crypto" className="bg-[#0f172a]">Crypto</option>
+                  <option value="Politics" className="bg-[#0f172a]">Politics</option>
+                  <option value="Sports" className="bg-[#0f172a]">Sports</option>
+                  <option value="Tech" className="bg-[#0f172a]">Tech</option>
+                  <option value="Economy" className="bg-[#0f172a]">Economy</option>
+                  <option value="Culture" className="bg-[#0f172a]">Culture</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-white/40 mb-2">
                   Market Question / Description

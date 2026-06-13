@@ -96,160 +96,201 @@ export default function PortfolioView() {
   const totalPnL = totalValue - totalInvested;
   const activeCount = holdings.filter(h => h.status === 'active').length;
 
-  function daysLeft(endDate: string): string {
-    const diff = new Date(endDate).getTime() - Date.now();
-    if (diff <= 0) return 'Ended';
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days > 30) return `${Math.floor(days / 30)}mo left`;
-    return `${days}d left`;
-  }
-
   return (
-    <div className="p-5 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
-      {/* Header */}
-      <div className="mb-8 animate-fade-in-up">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-xl border border-accent/10">
-            💼
-          </div>
-          <h1 className="section-header">Portfolio</h1>
+    <div className="relative min-h-[calc(100vh-80px)] pt-12 md:pt-20 pb-20 px-4 md:px-8 max-w-[1440px] mx-auto w-full flex flex-col">
+      {/* Background ambient glow effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 animate-fade-in-up">
+        <div className="space-y-1">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
+            Portfolio
+          </h1>
+          <p className="text-gray-400 font-medium">
+            Track and manage your prediction market positions
+          </p>
         </div>
-        <p className="text-text-secondary text-sm md:text-base mt-1">
-          {account
-            ? <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green" />
-                <span className="font-mono text-text-primary">{account.address.slice(0, 8)}…{account.address.slice(-6)}</span>
-              </span>
-            : 'Connect wallet to view live positions'
-          }
-        </p>
+        <button className="group mt-6 md:mt-0 relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-indigo-600/90 border border-indigo-500/50 rounded-xl hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] overflow-hidden">
+          <span className="relative z-10 flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+            Add Position
+          </span>
+        </button>
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        {[
-          { label: 'Invested', value: `$${totalInvested.toFixed(2)}` },
-          { label: 'Current Value', value: `$${totalValue.toFixed(2)}` },
-          { label: 'Total PnL', value: `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(2)}`, color: totalPnL >= 0 ? 'text-green' : 'text-red' },
-          { label: 'Active Positions', value: activeCount.toString() },
-        ].map((stat, i) => (
-          <div
-            key={i}
-            className="stat-card animate-fade-in-up"
-            style={{ animationDelay: `${i * 0.06}s` }}
-          >
-            <p className="text-[10px] text-text-muted mb-1 font-bold uppercase tracking-wider">{stat.label}</p>
-            <p className={`text-xl md:text-2xl font-extrabold font-mono tracking-tight ${stat.color || 'text-text-primary'}`}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Holdings List */}
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">
-          <span>📊</span> Your Positions
-        </h2>
-        <span className="badge badge-muted">{holdings.length} positions</span>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {holdings.map((h, i) => {
-          const pnl = h.currentValue - h.invested;
-          const pnlPercent = (pnl / h.invested) * 100;
-          const isUp = pnl >= 0;
-
-          return (
-            <div
-              key={h.id}
-              className="glass-card p-4 md:p-5 animate-fade-in-up"
-              style={{ animationDelay: `${0.2 + i * 0.06}s` }}
-            >
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
-                {/* Left: Market info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className={`badge ${h.position === 'YES' ? 'badge-green' : 'badge-red'}`}>
-                      {h.position}
-                    </span>
-                    <span className={`market-card__category market-card__category--${h.category}`} style={{ fontSize: '8px' }}>
-                      {h.category}
-                    </span>
-                    <span className={`badge ${h.status === 'active' ? 'badge-accent' : 'badge-muted'}`} style={{ fontSize: '8px' }}>
-                      {h.status === 'active' ? daysLeft(h.endDate) : 'Settled'}
-                    </span>
-                  </div>
-                  <p className="text-sm font-semibold text-text-primary leading-snug truncate">
-                    {h.question}
-                  </p>
-                </div>
-
-                {/* Right: Position details */}
-                <div className="flex items-center gap-6 md:gap-8 flex-shrink-0">
-                  <div className="text-right">
-                    <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Shares</p>
-                    <p className="text-sm font-bold font-mono">{h.shares}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Avg Cost</p>
-                    <p className="text-sm font-mono text-text-secondary">{h.avgCost.toFixed(2)}¢</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Current</p>
-                    <p className="text-sm font-mono text-text-primary font-semibold">{h.currentPrice.toFixed(2)}¢</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Value</p>
-                    <p className="text-sm font-mono text-text-primary font-bold">${h.currentValue.toFixed(2)}</p>
-                  </div>
-                  <div className="text-right min-w-[70px]">
-                    <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">PnL</p>
-                    <p className={`text-sm font-mono font-bold ${isUp ? 'text-green' : 'text-red'}`}>
-                      {isUp ? '+' : ''}${pnl.toFixed(2)}
-                    </p>
-                    <p className={`text-[10px] font-mono ${isUp ? 'text-green' : 'text-red'}`}>
-                      {isUp ? '+' : ''}{pnlPercent.toFixed(1)}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar showing position price */}
-              <div className="mt-3 h-1 rounded-full bg-bg-secondary overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${h.position === 'YES' ? 'bg-green' : 'bg-red'}`}
-                  style={{ width: `${h.currentPrice * 100}%` }}
-                />
-              </div>
+      {/* Dashboard Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+        {/* Metric Card 1 */}
+        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-indigo-500/30 transition-colors group" style={{ animationDelay: '0.05s' }}>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-50" />
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Portfolio Value</p>
+            <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500/20 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Potential Payout Summary */}
-      <div className="glass-card p-5 md:p-6 mt-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          </div>
           <div>
-            <h3 className="text-sm font-bold flex items-center gap-2 mb-1">
-              🎯 Payout Summary
-            </h3>
-            <p className="text-xs text-text-secondary">
-              If all your active positions resolve in your favor
-            </p>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Total Invested</p>
-              <p className="text-lg font-bold font-mono">${totalInvested.toFixed(2)}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] text-text-muted font-bold uppercase tracking-wider">Max Payout</p>
-              <p className="text-lg font-bold font-mono text-green">
-                ${holdings.filter(h => h.status === 'active').reduce((sum, h) => sum + h.potentialPayout, 0).toFixed(2)}
-              </p>
+            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">${totalValue.toFixed(2)}</h2>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-500/20 text-green-400 border border-green-500/20">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="mr-0.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                7.4%
+              </span>
+              <span className="text-xs text-gray-500 font-medium">all time</span>
             </div>
           </div>
+        </div>
+
+        {/* Metric Card 2 */}
+        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-emerald-500/30 transition-colors group" style={{ animationDelay: '0.1s' }}>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-50" />
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total P&L</p>
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
+              <span className="font-mono text-base font-bold">$</span>
+            </div>
+          </div>
+          <div>
+            <h2 className={`text-3xl font-bold font-mono tracking-tight ${totalPnL >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(2)}
+            </h2>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-xs text-emerald-400/80 font-medium">Realized & Unrealized</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Metric Card 3 */}
+        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-blue-500/30 transition-colors group" style={{ animationDelay: '0.15s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Positions</p>
+            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500/20 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            </div>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">{activeCount}</h2>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-xs text-gray-500 font-medium">Across 3 categories</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Metric Card 4 */}
+        <div className="relative overflow-hidden rounded-2xl bg-[#121212] border border-white/5 p-6 shadow-2xl animate-fade-in-up hover:border-amber-500/30 transition-colors group" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Win Rate</p>
+            <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold font-mono text-white tracking-tight">60.2%</h2>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-xs text-gray-500 font-medium">Based on resolved markets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Chart Section */}
+      <div className="mb-8 rounded-2xl bg-[#121212] border border-white/5 overflow-hidden shadow-2xl animate-fade-in-up relative" style={{ animationDelay: '0.25s' }}>
+        <div className="px-6 py-5 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+          <h2 className="text-base font-bold text-white tracking-wide">Performance History</h2>
+          <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-lg border border-white/5">
+            {['1W', '1M', '3M', 'YTD', 'ALL'].map(t => (
+              <button key={t} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${t === '1M' ? 'bg-indigo-500/20 text-indigo-400 shadow-sm border border-indigo-500/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="p-6 h-[280px] w-full relative">
+          {/* SVG Chart Line */}
+          <svg preserveAspectRatio="none" className="w-full h-full relative z-10" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 150 C 100 130, 200 170, 300 120 C 400 70, 500 140, 600 100 C 700 60, 800 80, 800 80 L 800 200 L 0 200 Z" fill="url(#chart_gradient)" fillOpacity="1"/>
+            <path d="M0 150 C 100 130, 200 170, 300 120 C 400 70, 500 140, 600 100 C 700 60, 800 80, 800 80" stroke="#818cf8" strokeWidth="3" strokeLinecap="round"/>
+            <defs>
+              <linearGradient id="chart_gradient" x1="400" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#818cf8" stopOpacity="0.25"/>
+                <stop offset="1" stopColor="#818cf8" stopOpacity="0"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div className="absolute inset-x-6 bottom-4 flex justify-between text-[10px] font-mono text-gray-500 tracking-widest uppercase z-10">
+            <span>Feb 16</span><span>Feb 20</span><span>Feb 24</span><span>Feb 28</span><span>Mar 4</span><span>Mar 8</span><span>Mar 12</span><span>Mar 16</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Positions Table */}
+      <div className="rounded-2xl bg-[#121212] border border-white/5 overflow-hidden shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+        <div className="px-6 py-5 border-b border-white/5">
+          <h2 className="text-base font-bold text-white tracking-wide">Current Positions</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr className="bg-black/20">
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">Market</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Side</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Shares</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Avg Price</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Current</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Value</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Return</th>
+                <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {holdings.map((h) => {
+                const pnl = h.currentValue - h.invested;
+                const pnlPercent = (pnl / h.invested) * 100;
+                const isUp = pnl >= 0;
+
+                return (
+                  <tr key={h.id} className="hover:bg-white/[0.02] transition-colors group">
+                    <td className="py-4 px-6">
+                      <div className="font-semibold text-white text-sm line-clamp-1 group-hover:text-indigo-400 transition-colors">
+                        {h.question}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1 capitalize">{h.category}</div>
+                    </td>
+                    <td className="py-4 px-6 text-center">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest ${
+                        h.position === 'YES' 
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}>
+                        {h.position}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-right font-mono text-sm text-gray-300">{h.shares}</td>
+                    <td className="py-4 px-6 text-right font-mono text-sm text-gray-400">{h.avgCost.toFixed(2)}¢</td>
+                    <td className="py-4 px-6 text-right font-mono text-sm text-white">{h.currentPrice.toFixed(2)}¢</td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="font-mono font-bold text-sm text-white">${h.currentValue.toFixed(2)}</div>
+                      <div className="font-mono text-[10px] text-gray-500 mt-1">Invested: ${h.invested.toFixed(2)}</div>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className={`font-mono font-bold text-sm ${isUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {isUp ? '+' : ''}${pnl.toFixed(2)}
+                      </div>
+                      <div className={`font-mono text-[11px] mt-1 ${isUp ? 'text-emerald-400/80' : 'text-red-400/80'}`}>
+                        {isUp ? '+' : ''}{pnlPercent.toFixed(1)}%
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <button className="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/5 border border-white/10 text-white hover:bg-indigo-500 hover:border-indigo-400 transition-all">
+                        Trade
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

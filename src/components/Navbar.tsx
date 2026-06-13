@@ -71,10 +71,7 @@ export default function Navbar() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
           </button>
           
-          {/* Deposit Button */}
-          <button className="px-5 py-2 text-sm font-semibold rounded-xl bg-white text-black hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)]">
-            Deposit
-          </button>
+
           
           {/* User Profile / Wallet */}
           <div className="connect-btn-wrapper">

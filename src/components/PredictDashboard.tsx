@@ -58,9 +58,30 @@ export default function PredictDashboard() {
   };
 
   const allMarkets = [...customMarkets, ...oracles];
-  const filteredOracles = allMarkets.filter(o => 
-    (o.name || o.oracle_id).toLowerCase().includes(searchQuery.toLowerCase())
+
+  const now = Date.now();
+  const closingSoonMarkets = [...allMarkets]
+    .filter(o => (o.expiry || 0) > now)
+    .sort((a, b) => (a.expiry || Infinity) - (b.expiry || Infinity));
+    
+  const freshMarkets = [...allMarkets].reverse();
+  
+  const hotTopicMarkets = [...allMarkets].filter(o => 
+    o.category?.toLowerCase() === 'crypto' || o.category?.toLowerCase() === 'politics' || o.category?.toLowerCase() === 'trending'
   );
+  if (hotTopicMarkets.length === 0) {
+    hotTopicMarkets.push(...allMarkets.slice(0, 5));
+  }
+
+  const filteredOracles = allMarkets.filter(o => {
+    const matchesSearch = (o.name || o.oracle_id).toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'all' || 
+                            activeCategory === 'trending' || 
+                            activeCategory === 'new' || 
+                            activeCategory === 'breakouts' ||
+                            (o.category && o.category.toLowerCase() === activeCategory.toLowerCase());
+    return matchesSearch && matchesCategory;
+  });
 
   const DISPLAY_CATEGORIES = [
     { id: 'trending', label: 'Trending', icon: '🔥' },
@@ -147,39 +168,97 @@ export default function PredictDashboard() {
         </div>
       )}
 
-      {/* ── Markets Grid ── */}
-      <section className="predict-grid-section">
-        <div className="predict-grid-header">
-          <h2 className="predict-grid-title">Prediction Markets</h2>
-          <span className="predict-grid-count">{filteredOracles.length} markets</span>
-        </div>
-
-        <div className="predict-grid">
-          {loading && customMarkets.length === 0 && oracles.length === 0 ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="market-card market-card--skeleton">
-                <div className="market-card__skeleton-line w-4/5" />
-                <div className="market-card__skeleton-line w-2/5" />
-                <div className="market-card__skeleton-bar" />
-                <div className="market-card__skeleton-bar" />
+      {/* ── Markets Content ── */}
+      {activeCategory === 'all' && !searchQuery ? (
+        <div className="predict-carousels">
+          {/* Closing Soon */}
+          {closingSoonMarkets.length > 0 && (
+            <section className="predict-carousel-section">
+              <div className="predict-carousel-header">
+                <h2 className="predict-carousel-title">⏳ Closing Soon</h2>
               </div>
-            ))
-          ) : filteredOracles.length > 0 ? (
-            filteredOracles.map((oracle, i) => (
-              <MarketCard 
-                key={oracle.oracle_id} 
-                oracle={oracle} 
-                index={i} 
-                onClick={() => handleMarketSelect(oracle)}
-              />
-            ))
-          ) : (
-            <div className="col-span-full py-12 text-center text-gray-500">
-               No markets found.
-            </div>
+              <div className="predict-carousel-track-wrapper">
+                <div className="predict-carousel-track">
+                  {closingSoonMarkets.slice(0, 10).map((oracle, i) => (
+                    <div className="predict-carousel-item" key={`closing-${oracle.oracle_id}`}>
+                      <MarketCard oracle={oracle} index={i} onClick={() => handleMarketSelect(oracle)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Fresh Markets */}
+          {freshMarkets.length > 0 && (
+            <section className="predict-carousel-section">
+              <div className="predict-carousel-header">
+                <h2 className="predict-carousel-title">✨ Fresh</h2>
+              </div>
+              <div className="predict-carousel-track-wrapper">
+                <div className="predict-carousel-track">
+                  {freshMarkets.slice(0, 10).map((oracle, i) => (
+                    <div className="predict-carousel-item" key={`fresh-${oracle.oracle_id}`}>
+                      <MarketCard oracle={oracle} index={i} onClick={() => handleMarketSelect(oracle)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Hot Topics */}
+          {hotTopicMarkets.length > 0 && (
+            <section className="predict-carousel-section">
+              <div className="predict-carousel-header">
+                <h2 className="predict-carousel-title">🔥 Hot Topic</h2>
+              </div>
+              <div className="predict-carousel-track-wrapper">
+                <div className="predict-carousel-track">
+                  {hotTopicMarkets.slice(0, 10).map((oracle, i) => (
+                    <div className="predict-carousel-item" key={`hot-${oracle.oracle_id}`}>
+                      <MarketCard oracle={oracle} index={i} onClick={() => handleMarketSelect(oracle)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
           )}
         </div>
-      </section>
+      ) : (
+        <section className="predict-grid-section">
+          <div className="predict-grid-header">
+            <h2 className="predict-grid-title">Prediction Markets</h2>
+            <span className="predict-grid-count">{filteredOracles.length} markets</span>
+          </div>
+
+          <div className="predict-grid">
+            {loading && customMarkets.length === 0 && oracles.length === 0 ? (
+              Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="market-card market-card--skeleton">
+                  <div className="market-card__skeleton-line w-4/5" />
+                  <div className="market-card__skeleton-line w-2/5" />
+                  <div className="market-card__skeleton-bar" />
+                  <div className="market-card__skeleton-bar" />
+                </div>
+              ))
+            ) : filteredOracles.length > 0 ? (
+              filteredOracles.map((oracle, i) => (
+                <MarketCard 
+                  key={oracle.oracle_id} 
+                  oracle={oracle} 
+                  index={i} 
+                  onClick={() => handleMarketSelect(oracle)}
+                />
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center text-gray-500">
+                 No markets found.
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── Modals ── */}
       {selectedMarket && (

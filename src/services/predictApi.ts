@@ -16,6 +16,7 @@ export interface OracleState {
   expiry_date: string;
   status: 'inactive' | 'active' | 'pending_settlement' | 'settled';
   settlement_price?: number;
+  category?: string;
   svi?: {
     a: number;
     b: number;
