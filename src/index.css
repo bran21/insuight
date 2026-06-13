@@ -2984,3 +2984,149 @@ body {
   font-weight: 700;
   color: var(--color-green);
 }
+
+/* ═══════════════════════════════════════════════════════════ */
+/* ─── LEADERBOARD PAGE ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════ */
+
+.leaderboard-page {
+  padding: 1.5rem 1.25rem 3rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@media (min-width: 768px)  { .leaderboard-page { padding: 2rem 2rem 3rem; } }
+@media (min-width: 1024px) { .leaderboard-page { padding: 2.5rem 2.5rem 4rem; } }
+
+/* ── Rank column ── */
+.lb-th--rank {
+  width: 64px;
+  text-align: center !important;
+}
+
+.lb-td--rank {
+  text-align: center;
+}
+
+.lb-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.lb-rank--gold {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  font-size: 1rem;
+}
+
+.lb-rank--silver {
+  background: rgba(163, 163, 163, 0.15);
+  color: #a3a3a3;
+  font-size: 1rem;
+}
+
+.lb-rank--bronze {
+  background: rgba(180, 83, 9, 0.15);
+  color: #d97706;
+  font-size: 1rem;
+}
+
+.lb-rank--default {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+}
+
+/* ── Trader cell ── */
+.lb-trader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lb-trader__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #818cf8;
+  flex-shrink: 0;
+}
+
+.lb-trader__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  transition: color 0.15s ease;
+}
+
+.portfolio-table__row:hover .lb-trader__name {
+  color: #818cf8;
+}
+
+.lb-trader__addr {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
+/* ── ROI column ── */
+.lb-roi {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-green) !important;
+  font-size: 0.8125rem;
+}
+
+/* ── PnL column ── */
+.lb-pnl {
+  color: var(--color-green) !important;
+}
+
+/* ── Win rate bar ── */
+.lb-winrate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.lb-winrate__bar {
+  width: 48px;
+  height: 5px;
+  background: var(--color-bg-secondary);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lb-winrate__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  transition: width 0.6s ease;
+}
+
+.lb-winrate__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  min-width: 32px;
+  text-align: right;
+}
